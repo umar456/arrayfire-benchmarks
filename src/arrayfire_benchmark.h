@@ -50,6 +50,7 @@ namespace benchmark {
     BenchmarkCollection* ArgNames(const std::vector<std::string>& names)                 { for(auto& b : benchmarks_) b->ArgNames(names); return this; }
     BenchmarkCollection* RangeMultiplier(int multiplier)                                 { for(auto& b : benchmarks_) b->RangeMultiplier(multiplier); return this; }
     BenchmarkCollection* MinTime(double t)                                               { for(auto& b : benchmarks_) b->MinTime(t); return this; }
+    BenchmarkCollection* Apply(void (*func)(::benchmark::internal::Benchmark* benchmark)){ for(auto& b : benchmarks_) b->Apply(func); return this; }
     BenchmarkCollection* Iterations(size_t n)                                            { for(auto& b : benchmarks_) b->Iterations(n); return this; }
   };
 
@@ -100,8 +101,8 @@ namespace benchmark {
   // };
 
 template <class Lambda, class... Args>
-BenchmarkCollection* RegisterBenchmark(const char* name, std::vector<af_dtype> types, Lambda&& fn,
-                                        Args&&... args) {
+BenchmarkCollection* RegisterBenchmark(const char* name, std::vector<af_dtype> types, Lambda* fn,
+                                        Args... args) {
   using namespace af;
 
   BenchmarkCollection *collection = new BenchmarkCollection();
