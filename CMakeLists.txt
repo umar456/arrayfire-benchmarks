@@ -5,6 +5,10 @@ project(ArrayFire-Benchmarks
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_BUILD_RPATH
+	arrayfire/src/backend/cpu
+	arrayfire/src/backend/cuda
+	arrayfire/src/backend/opencl)
 add_subdirectory(arrayfire EXCLUDE_FROM_ALL)
 
 set(BENCHMARK_ENABLE_TESTING OFF CACHE INTERNAL "")
