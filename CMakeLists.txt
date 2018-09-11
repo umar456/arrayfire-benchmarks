@@ -1,15 +1,19 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(ArrayFire-Benchmarks
-  VERSION 3.6)
+project(ArrayFire-Benchmarks VERSION 3.6)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_BUILD_RPATH
-	arrayfire/src/backend/cpu
-	arrayfire/src/backend/cuda
-	arrayfire/src/backend/opencl)
-add_subdirectory(arrayfire EXCLUDE_FROM_ALL)
+
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/arrayfire)
+  set(CMAKE_BUILD_RPATH
+    arrayfire/src/backend/cpu
+    arrayfire/src/backend/cuda
+    arrayfire/src/backend/opencl)
+  add_subdirectory(arrayfire EXCLUDE_FROM_ALL)
+else ()
+  find_package(ArrayFire REQUIRED)
+endif ()
 
 set(BENCHMARK_ENABLE_TESTING OFF CACHE INTERNAL "")
 set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE INTERNAL "")
