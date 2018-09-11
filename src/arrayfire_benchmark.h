@@ -99,9 +99,9 @@ namespace benchmark {
   //   }
   // };
 
-  template <class Lambda, class... Args>
-  BenchmarkCollection* RegisterBenchmark(const char* name, std::vector<af_dtype> types, Lambda&& fn,
-                                          Args&&... args) {
+template <class Lambda, class... Args>
+BenchmarkCollection* RegisterBenchmark(const char* name, std::vector<af_dtype> types, Lambda&& fn,
+                                        Args&&... args) {
   using namespace af;
 
   BenchmarkCollection *collection = new BenchmarkCollection();

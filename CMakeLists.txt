@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.5)
 project(ArrayFire-Benchmarks
   VERSION 3.6)
 
-set(CMAKE_PREFIX_PATH arrayfire/test/gtest)
 add_subdirectory(arrayfire EXCLUDE_FROM_ALL)
 
 set(BENCHMARK_ENABLE_TESTING OFF CACHE INTERNAL "")
@@ -18,6 +17,9 @@ target_link_libraries(randu benchmark ArrayFire::af)
 
 add_executable(topk src/topk.cpp)
 target_link_libraries(topk benchmark ArrayFire::af)
+
+add_executable(pi src/pi.cpp)
+target_link_libraries(pi benchmark ArrayFire::af)
 
 add_executable(unified_af src/unified.cpp)
 add_executable(unified_cuda src/unified.cpp)
