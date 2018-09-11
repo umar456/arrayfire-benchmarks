@@ -34,6 +34,9 @@ target_link_libraries(pi benchmark ArrayFire::af)
 add_executable(asm src/anisotropic_smoothing.cpp)
 target_link_libraries(asm benchmark ArrayFire::af)
 
+add_executable(fft src/fft.cpp)
+target_link_libraries(fft benchmark ArrayFire::af)
+
 add_executable(unified_af src/unified.cpp)
 add_executable(unified_cuda src/unified.cpp)
 target_link_libraries(unified_af benchmark ArrayFire::af)
