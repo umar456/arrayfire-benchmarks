@@ -5,16 +5,16 @@
 
 #include <cmath>
 
-using std::vector;
-using std::cbrt;
-using std::to_string;
 using af::array;
-using af::randu;
-using af::topk;
-using af::dim4;
-using af::deviceMemInfo;
 using af::deviceGC;
 using af::deviceInfo;
+using af::deviceMemInfo;
+using af::dim4;
+using af::randu;
+using af::topk;
+using std::cbrt;
+using std::to_string;
+using std::vector;
 
 static void topkBenchBase(benchmark::State& state, dim4 dims, int k, af_dtype type) {
   //af_dtype type = type;

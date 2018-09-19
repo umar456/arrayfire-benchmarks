@@ -41,6 +41,9 @@ target_link_libraries(randu af_benchmark)
 add_executable(topk src/topk.cpp)
 target_link_libraries(topk af_benchmark)
 
+add_executable(nearest_neighbor src/nearest_neighbor.cpp)
+target_link_libraries(nearest_neighbor af_benchmark)
+
 add_executable(pi src/pi.cpp)
 target_link_libraries(pi af_benchmark)
 
