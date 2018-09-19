@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
         ->Iterations(1);
 
   af::benchmark::RegisterBenchmark("topkMemDims1", types, topkBench)
-        ->Ranges({{5, 5}, {100, 100}, {1, 1<<16}})
+        ->Ranges({{5, 5}, {100, 100}, {1, 1<<15}})
         ->ArgNames({"k", "dim0", "[dim1]"})
         ->Iterations(1);
 

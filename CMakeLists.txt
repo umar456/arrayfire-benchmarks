@@ -22,22 +22,32 @@ add_subdirectory(benchmark EXCLUDE_FROM_ALL)
 
 include_directories(src)
 
-add_executable(randu src/randu.cpp)
-target_link_libraries(randu benchmark ArrayFire::af)
+add_library(af_benchmark
+  src/af_benchmark.cpp
+  src/af_console_reporter.cpp
+  src/af_json_reporter.cpp)
+
+target_link_libraries(af_benchmark
+  PUBLIC
+    benchmark ArrayFire::af)
+
+add_executable(randu src/randu.cpp )
+target_link_libraries(randu af_benchmark)
 
 add_executable(topk src/topk.cpp)
-target_link_libraries(topk benchmark ArrayFire::af)
+target_link_libraries(topk af_benchmark)
 
 add_executable(pi src/pi.cpp)
-target_link_libraries(pi benchmark ArrayFire::af)
+target_link_libraries(pi af_benchmark)
 
 add_executable(anisotropic_smoothing src/anisotropic_smoothing.cpp)
-target_link_libraries(anisotropic_smoothing benchmark ArrayFire::af)
+target_link_libraries(anisotropic_smoothing af_benchmark)
 
 add_executable(fft src/fft.cpp)
-target_link_libraries(fft benchmark ArrayFire::af)
+target_link_libraries(fft af_benchmark)
+
 
 add_executable(unified_af src/unified.cpp)
 add_executable(unified_cuda src/unified.cpp)
-target_link_libraries(unified_af benchmark ArrayFire::af)
-target_link_libraries(unified_cuda benchmark ArrayFire::afcuda)
+target_link_libraries(unified_af benchmark ArrayFire::af af_benchmark)
+target_link_libraries(unified_cuda benchmark ArrayFire::afcuda af_benchmark)
