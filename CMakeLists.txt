@@ -13,6 +13,10 @@ if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/arrayfire)
   add_subdirectory(arrayfire EXCLUDE_FROM_ALL)
 else ()
   find_package(ArrayFire REQUIRED)
+  set(CMAKE_BUILD_RPATH
+    ${ArrayFire_DIR}/src/backend/cpu
+    ${ArrayFire_DIR}/src/backend/cuda
+    ${ArrayFire_DIR}/src/backend/opencl)
 endif ()
 
 set(BENCHMARK_ENABLE_TESTING OFF CACHE INTERNAL "")
