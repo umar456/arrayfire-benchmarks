@@ -44,6 +44,13 @@ target_link_libraries(topk af_benchmark)
 add_executable(pi src/pi.cpp)
 target_link_libraries(pi af_benchmark)
 
+add_executable(af_conv_relu_pool src/af_conv_relu_pool.cpp)
+target_link_libraries(af_conv_relu_pool af_benchmark)
+
+add_executable(cudnn_conv_relu_pool src/cudnn_conv_relu_pool.cpp)
+target_include_directories(cudnn_conv_relu_pool PRIVATE /opt/cuda/include)
+target_link_libraries(cudnn_conv_relu_pool -L/opt/cuda/lib64 -lcudnn -lcudart af_benchmark)
+
 add_executable(anisotropic_smoothing src/anisotropic_smoothing.cpp)
 target_link_libraries(anisotropic_smoothing af_benchmark)
 
