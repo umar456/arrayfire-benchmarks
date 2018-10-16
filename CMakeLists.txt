@@ -55,3 +55,6 @@ add_executable(unified_af src/unified.cpp)
 add_executable(unified_cuda src/unified.cpp)
 target_link_libraries(unified_af benchmark ArrayFire::af af_benchmark)
 target_link_libraries(unified_cuda benchmark ArrayFire::afcuda af_benchmark)
+
+add_executable(batched_matmul src/batched_matmul.cpp)
+target_link_libraries(batched_matmul af_benchmark)
