@@ -60,6 +60,10 @@ target_link_libraries(anisotropic_smoothing af_benchmark)
 add_executable(fft src/fft.cpp)
 target_link_libraries(fft af_benchmark)
 
+add_executable(jit src/jit.cpp)
+target_link_libraries(jit af_benchmark)
+add_dependencies(jit test_jit_unified)
+
 
 add_executable(unified_af src/unified.cpp)
 add_executable(unified_cuda src/unified.cpp)
