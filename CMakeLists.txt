@@ -33,7 +33,7 @@ add_library(af_benchmark
 
 target_link_libraries(af_benchmark
   PUBLIC
-    benchmark ArrayFire::af)
+    benchmark ArrayFire::af ${CMAKE_DL_LIBS})
 
 add_executable(randu src/randu.cpp )
 target_link_libraries(randu af_benchmark)
@@ -60,15 +60,23 @@ target_link_libraries(anisotropic_smoothing af_benchmark)
 add_executable(fft src/fft.cpp)
 target_link_libraries(fft af_benchmark)
 
+add_executable(indexing src/indexing.cpp)
+target_link_libraries(indexing af_benchmark)
+add_dependencies(indexing test_index_unified)
+
 add_executable(jit src/jit.cpp)
 target_link_libraries(jit af_benchmark)
 add_dependencies(jit test_jit_unified)
 
+
+add_executable(tile src/tile.cpp)
+target_link_libraries(tile af_benchmark)
+add_dependencies(tile test_tile_unified)
 
 add_executable(unified_af src/unified.cpp)
 add_executable(unified_cuda src/unified.cpp)
 target_link_libraries(unified_af benchmark ArrayFire::af af_benchmark)
 target_link_libraries(unified_cuda benchmark ArrayFire::afcuda af_benchmark)
 
-add_executable(batched_matmul src/batched_matmul.cpp)
-target_link_libraries(batched_matmul af_benchmark)
+add_executable(matmul src/matmul.cpp)
+target_link_libraries(matmul af_benchmark)

@@ -80,6 +80,56 @@ static void jitBench2(benchmark::State& state, af_dtype type) {
   state.counters["elements"] = dims.elements();
 }
 
+static void multipleEval(benchmark::State& state, af_dtype type) {
+  dim4 dims(state.range(0), state.range(1), state.range(2), state.range(3));
+  int nops = state.range(4);
+  {
+    array a = randu(dims, type);
+    array b = randu(dims, type);
+    array cond = constant(1, dims, b8);
+    sync();
+
+    if(nops == 2) {
+      for(auto _ : state) {
+        a = a * 2;
+        b = b + a;
+        af::eval(a, b);
+        sync();
+      }
+    } else {
+      for(auto _ : state) {
+        a = a * 2;
+        b = b + a;
+        af::eval(a);
+        af::eval(b);
+        sync();
+      }
+    }
+  }
+
+  array a = randu(dims, type);
+  array b = randu(dims, type);
+  sync();
+
+  if(nops == 2) {
+    for(auto _ : state) {
+      a = a * 2;
+      b = b + a;
+      af::eval(a, b);
+      sync();
+    }
+  } else {
+    for(auto _ : state) {
+      a = a * 2;
+      b = b + a;
+      af::eval(a);
+      af::eval(b);
+      sync();
+    }
+  }
+  state.counters["elements"] = dims.elements();
+}
+
 
 long long calc_elements(long long d0, long long d1, long long d2, long long d3) {
   return (1<<d0) * (1<<d1) * (1<<d2) * (1<<d3);
@@ -113,8 +163,15 @@ SameSize(benchmark::internal::Benchmark* b) {
 int main(int argc, char** argv) {
   //af::setBackend(AF_BACKEND_CUDA);
   //af::setBackend(AF_BACKEND_OPENCL);
+  //af::setBackend(AF_BACKEND_CPU);
 
   vector<af_dtype> types = {f32};
+
+  af::benchmark::RegisterBenchmark("multiEval", types, multipleEval)
+    //->Iterations(1)
+    ->Ranges({{1, 1<<28}, {1, 1}, {1, 1}, {1, 1}, {1, 2}})
+    ->ArgNames({"dim0", "dim1", "dim2", "dim3", "nops"})
+    ->Unit(benchmark::kMicrosecond);
 
   af::benchmark::RegisterBenchmark("jitDim0", types, jitBench)
     //->Iterations(1)
@@ -122,11 +179,11 @@ int main(int argc, char** argv) {
     ->ArgNames({"dim0", "dim1", "dim2", "dim3", "nops"})
     ->Unit(benchmark::kMicrosecond);
 
-  af::benchmark::RegisterBenchmark("jitDim0Select", types, jitBench2)
-    //->Iterations(1)
-    ->Ranges({{1, 1<<28}, {1, 1}, {1, 1}, {1, 1}, {1, 1<<8}})
-    ->ArgNames({"dim0", "dim1", "dim2", "dim3", "nops"})
-    ->Unit(benchmark::kMicrosecond);
+  //  af::benchmark::RegisterBenchmark("jitDim0Select", types, jitBench2)
+  //    //->Iterations(1)
+  //    ->Ranges({{1, 1<<28}, {1, 1}, {1, 1}, {1, 1}, {1, 1<<8}})
+  //    ->ArgNames({"dim0", "dim1", "dim2", "dim3", "nops"})
+  //    ->Unit(benchmark::kMicrosecond);
 
   af::benchmark::RegisterBenchmark("jit2", types, jitBench)
     //->Iterations(2)
@@ -134,7 +191,7 @@ int main(int argc, char** argv) {
     ->ArgNames({"dim0", "dim1", "dim2", "dim3", "nops"})
     ->Unit(benchmark::kMicrosecond);
 
-  benchmark::Initialize(&argc, argv);
+  af::benchmark::Initialize(&argc, argv);
 
   af::benchmark::AFReporter r;
   benchmark::RunSpecifiedBenchmarks(&r);

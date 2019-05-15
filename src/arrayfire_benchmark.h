@@ -1,4 +1,5 @@
 
+#pragma once
 #include <string>
 #include <vector>
 
@@ -86,6 +87,10 @@ BenchmarkCollection* RegisterBenchmark(const char* name, std::vector<af_dtype> t
     collection->Add(::benchmark::RegisterBenchmark(test_name, [=](::benchmark::State& st) { fn(st, type, args...); }));
   }
   return collection;
+}
+
+static inline void Initialize(int *argc, char **argv) {
+  ::benchmark::Initialize(argc, argv);
 }
 
 }
