@@ -47,7 +47,7 @@ add_executable(unified_cuda src/unified.cpp)
 target_link_libraries(unified_af benchmark ArrayFire::af af_benchmark)
 target_link_libraries(unified_cuda benchmark ArrayFire::afcuda af_benchmark)
 
-SET(benchmarks randu topk nearest_neighbor pi af_conv_relu_pool fft indexing jit tile matmul reduce norm sort)
+SET(benchmarks randu topk nearest_neighbor pi af_conv_relu_pool fft indexing jit tile matmul reduce norm sort stdev)
 
 function(addBenchmark name)
   add_executable(${name} src/${name}.cpp)
