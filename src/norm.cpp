@@ -1,4 +1,3 @@
-
 #include <arrayfire_benchmark.h>
 #include <arrayfire.h>
 #include <vector>
@@ -10,20 +9,20 @@ using af::deviceMemInfo;
 using std::vector;
 using af::sum;
 
-void sortBench(benchmark::State& state, af_dtype type) {
-    af::dim4 dataDims(state.range(0), state.range(1));
-    unsigned sortDim = state.range(2);
+void normBench(benchmark::State& state, af_dtype type) {
+    af::dim4 dataDims(state.range(0));
+    af::normType nType = static_cast<af::normType>(state.range(1));
     array input = randu(dataDims, type);
     array output;
     size_t alloc_bytes, alloc_buffers, lock_bytes, lock_buffers;
     deviceMemInfo(&alloc_bytes, &alloc_buffers, &lock_bytes, &lock_buffers);
     af::sync();
 
-    output = sort(input, sortDim);
+    output = norm(input, nType);
     af::sync();
 
     for(auto _ : state) {
-        output = sort(input, sortDim);
+        output = norm(input, nType);
         af::sync();
     }
 
@@ -34,13 +33,23 @@ void sortBench(benchmark::State& state, af_dtype type) {
     deviceGC(); 
 }
 
+static void CustomArguments(benchmark::internal::Benchmark* b) {
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 2; j < 16; j+=2) {
+            
+            if (i != 6) b->Args({1 << j, i});
+        }
+    }
+}
+
 int main(int argc, char** argv) {
     vector<af_dtype> types = {f32, f64};
 
     benchmark::Initialize(&argc, argv);
-    af::benchmark::RegisterBenchmark("sort", types, sortBench)
-        ->Ranges({{8, 1<<12}, {8, 1<<12}, {0, 1}})
-        ->ArgNames({"dim0", "dim1", "sortDim"})
+    af::benchmark::RegisterBenchmark("norm", types, normBench)
+        // ->Ranges({{8, 1<<26}})
+        ->Apply(CustomArguments)
+        ->ArgNames({"dim0", "normtype"})
         ->Unit(benchmark::kMicrosecond);
 
     af::benchmark::AFReporter r;

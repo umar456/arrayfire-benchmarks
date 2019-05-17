@@ -84,5 +84,8 @@ target_link_libraries(matmul af_benchmark)
 add_executable(reduce src/reduce.cpp)
 target_link_libraries(reduce af_benchmark)
 
+add_executable(norm src/norm.cpp)
+target_link_libraries(norm af_benchmark)
+
 add_executable(sort src/sort.cpp)
 target_link_libraries(sort af_benchmark)
