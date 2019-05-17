@@ -42,22 +42,6 @@ target_link_libraries(af_benchmark
 add_executable(anisotropic_smoothing src/anisotropic_smoothing.cpp)
 target_link_libraries(anisotropic_smoothing af_benchmark)
 
-#add_executable(fft src/fft.cpp)
-#target_link_libraries(fft af_benchmark)
-
-#add_executable(indexing src/indexing.cpp)
-#target_link_libraries(indexing af_benchmark)
-#add_dependencies(indexing test_index_unified)
-
-#add_executable(jit src/jit.cpp)
-#target_link_libraries(jit af_benchmark)
-#add_dependencies(jit test_jit_unified)
-
-
-#add_executable(tile src/tile.cpp)
-#target_link_libraries(tile af_benchmark)
-#add_dependencies(tile test_tile_unified)
-
 add_executable(unified_af src/unified.cpp)
 add_executable(unified_cuda src/unified.cpp)
 target_link_libraries(unified_af benchmark ArrayFire::af af_benchmark)
