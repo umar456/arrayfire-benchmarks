@@ -36,7 +36,7 @@ void normBench(benchmark::State& state, af_dtype type) {
 static void CustomArguments(benchmark::internal::Benchmark* b) {
     for (int i = 0; i < 8; ++i) {
         for (int j = 2; j < 16; j+=2) {
-            
+            // TODO: Add normType 6 when it becomes supported 
             if (i != 6) b->Args({1 << j, i});
         }
     }

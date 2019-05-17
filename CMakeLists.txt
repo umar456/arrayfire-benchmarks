@@ -35,21 +35,6 @@ target_link_libraries(af_benchmark
   PUBLIC
     benchmark ArrayFire::af ${CMAKE_DL_LIBS})
 
-add_executable(randu src/randu.cpp )
-target_link_libraries(randu af_benchmark)
-
-add_executable(topk src/topk.cpp)
-target_link_libraries(topk af_benchmark)
-
-add_executable(nearest_neighbor src/nearest_neighbor.cpp)
-target_link_libraries(nearest_neighbor af_benchmark)
-
-add_executable(pi src/pi.cpp)
-target_link_libraries(pi af_benchmark)
-
-add_executable(af_conv_relu_pool src/af_conv_relu_pool.cpp)
-target_link_libraries(af_conv_relu_pool af_benchmark)
-
 # add_executable(cudnn_conv_relu_pool src/cudnn_conv_relu_pool.cpp)
 # target_include_directories(cudnn_conv_relu_pool PRIVATE /opt/cuda/include)
 # target_link_libraries(cudnn_conv_relu_pool -L/opt/cuda/lib64 -lcudnn -lcudart af_benchmark)
@@ -57,20 +42,20 @@ target_link_libraries(af_conv_relu_pool af_benchmark)
 add_executable(anisotropic_smoothing src/anisotropic_smoothing.cpp)
 target_link_libraries(anisotropic_smoothing af_benchmark)
 
-add_executable(fft src/fft.cpp)
-target_link_libraries(fft af_benchmark)
+#add_executable(fft src/fft.cpp)
+#target_link_libraries(fft af_benchmark)
 
-add_executable(indexing src/indexing.cpp)
-target_link_libraries(indexing af_benchmark)
+#add_executable(indexing src/indexing.cpp)
+#target_link_libraries(indexing af_benchmark)
 #add_dependencies(indexing test_index_unified)
 
-add_executable(jit src/jit.cpp)
-target_link_libraries(jit af_benchmark)
+#add_executable(jit src/jit.cpp)
+#target_link_libraries(jit af_benchmark)
 #add_dependencies(jit test_jit_unified)
 
 
-add_executable(tile src/tile.cpp)
-target_link_libraries(tile af_benchmark)
+#add_executable(tile src/tile.cpp)
+#target_link_libraries(tile af_benchmark)
 #add_dependencies(tile test_tile_unified)
 
 add_executable(unified_af src/unified.cpp)
@@ -78,14 +63,13 @@ add_executable(unified_cuda src/unified.cpp)
 target_link_libraries(unified_af benchmark ArrayFire::af af_benchmark)
 target_link_libraries(unified_cuda benchmark ArrayFire::afcuda af_benchmark)
 
-add_executable(matmul src/matmul.cpp)
-target_link_libraries(matmul af_benchmark)
+SET(benchmarks randu topk nearest_neighbor pi af_conv_relu_pool fft indexing jit tile matmul reduce norm sort)
 
-add_executable(reduce src/reduce.cpp)
-target_link_libraries(reduce af_benchmark)
+function(addBenchmark name)
+  add_executable(${name} src/${name}.cpp)
+  target_link_libraries(${name} af_benchmark)
+endfunction()
 
-add_executable(norm src/norm.cpp)
-target_link_libraries(norm af_benchmark)
-
-add_executable(sort src/sort.cpp)
-target_link_libraries(sort af_benchmark)
+foreach(benchmark ${benchmarks})
+  addBenchmark(${benchmark})
+endforeach() 
