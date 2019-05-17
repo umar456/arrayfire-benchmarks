@@ -18,9 +18,8 @@ static auto genNorm(af::normType nType) {
         af::dim4 dataDims(state.range(0));
         array input = randu(dataDims, type);
         {
-           norm(input, nType);
+          norm(input, nType);
         }
-        deviceMemInfo(&alloc_bytes, &alloc_buffers, &lock_bytes, &lock_buffers);
         af::sync();
 
         for(auto _ : state) {
