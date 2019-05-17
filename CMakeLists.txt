@@ -47,28 +47,22 @@ add_executable(unified_cuda src/unified.cpp)
 target_link_libraries(unified_af benchmark ArrayFire::af af_benchmark)
 target_link_libraries(unified_cuda benchmark ArrayFire::afcuda af_benchmark)
 
-SET(benchmarks
-  randu
-  topk
-  nearest_neighbor
-  pi
-  af_conv_relu_pool
-  fft
-  indexing
-  jit
-  tile
-  matmul
-  reduce
-  norm
-  sort
-  stdev
-  mean)
-
 function(addBenchmark name)
   add_executable(${name} src/${name}.cpp)
   target_link_libraries(${name} af_benchmark)
 endfunction()
 
-foreach(benchmark ${benchmarks})
-  addBenchmark(${benchmark})
-endforeach() 
+addBenchmark(randu)
+addBenchmark(topk)
+addBenchmark(nearest_neighbor)
+addBenchmark(pi)
+addBenchmark(af_conv_relu_pool)
+addBenchmark(fft)
+addBenchmark(indexing)
+addBenchmark(jit)
+addBenchmark(tile)
+addBenchmark(matmul)
+addBenchmark(reduce)
+addBenchmark(norm)
+addBenchmark(sort)
+addBenchmark(stdev)
