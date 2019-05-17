@@ -17,24 +17,16 @@ static auto genNorm(af::normType nType) {
     return [nType](benchmark::State& state, af_dtype type) {
         af::dim4 dataDims(state.range(0));
         array input = randu(dataDims, type);
-        array output;
-        size_t alloc_bytes, alloc_buffers, lock_bytes, lock_buffers;
+        {
+           norm(input, nType);
+        }
         deviceMemInfo(&alloc_bytes, &alloc_buffers, &lock_bytes, &lock_buffers);
         af::sync();
 
-        output = norm(input, nType);
-        af::sync();
-
         for(auto _ : state) {
-            output = norm(input, nType);
+            norm(input, nType);
             af::sync();
         }
-
-        size_t alloc_bytes2, alloc_buffers2, lock_bytes2, lock_buffers2;
-        deviceMemInfo(&alloc_bytes2, &alloc_buffers2, &lock_bytes2, &lock_buffers2);
-
-        state.counters["Bytes"] = (alloc_bytes2 - alloc_bytes);
-        deviceGC(); 
     }; 
 }
 
