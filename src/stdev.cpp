@@ -10,9 +10,9 @@ using std::vector;
 using af::sum;
 
 void stdevBench(benchmark::State& state, af_dtype type) {
-    af::dim4 aDim(state.range(0), state.range(1));
+    af::dim4 aDim(state.range(0), state.range(1), state.range(2), state.range(3));
     array a = randu(aDim, type);
-    unsigned stdevDim = state.range(2);
+    unsigned stdevDim = state.range(4);
     { stdev(a, stdevDim); }
     af::sync();
 
@@ -27,8 +27,8 @@ int main(int argc, char** argv) {
 
     benchmark::Initialize(&argc, argv);
     af::benchmark::RegisterBenchmark("stdev", types, stdevBench)
-        ->Ranges({{8, 1<<12}, {8, 1<<12}, {0, 3}})
-        ->ArgNames({"dim0", "dim1", "stdevDim"})
+        ->Ranges({{8, 1<<12}, {8, 1<<12}, {8, 1<<12}, {8, 1<<12}, {0, 3}})
+        ->ArgNames({"dim0", "dim1", "dim2", "dim3", "stdevDim"})
         ->Unit(benchmark::kMicrosecond);
 
     af::benchmark::AFReporter r;

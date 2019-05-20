@@ -15,7 +15,7 @@ using std::pair;
 
 static auto genNorm(af::normType nType) {
     return [nType](benchmark::State& state, af_dtype type) {
-        af::dim4 dataDims(state.range(0));
+        af::dim4 dataDims(state.range(0), state.range(1));
         array input = randu(dataDims, type);
         {
           norm(input, nType);
@@ -32,8 +32,8 @@ static auto genNorm(af::normType nType) {
 void registerBenchmark(std::string name, af::normType type) {
     static vector<af_dtype> types = {f32, f64};
     af::benchmark::RegisterBenchmark(("norm:" + name).c_str() , types, genNorm(type))
-        ->Ranges({{8, 1<<24}})
-        ->ArgNames({"dim0"})
+        ->Ranges({{8, 1 << 24}, {8, 1 << 24}})
+        ->ArgNames({"dim0", "dim1"})
         ->Unit(benchmark::kMicrosecond);
 }
 
