@@ -84,7 +84,9 @@ BenchmarkCollection* RegisterBenchmark(const char* name, std::vector<af_dtype> t
   for (auto& type : types) {
     char test_name[2048];
     snprintf(test_name, 2048, "%s/%s", name, to_string(type).c_str());
-    collection->Add(::benchmark::RegisterBenchmark(test_name, [=](::benchmark::State& st) { fn(st, type, args...); }));
+    collection->Add(
+      ::benchmark::RegisterBenchmark(test_name, [=](::benchmark::State& st) {
+          fn(st, type, args...); }));
   }
   return collection;
 }

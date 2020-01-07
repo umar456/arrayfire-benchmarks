@@ -1,79 +1,119 @@
 #include <arrayfire_benchmark.h>
-#include <benchmark/benchmark.h>
+
 #include <arrayfire.h>
+#if defined(ENABLE_ITK)
+#include "itkImageFileReader.h"
+#include "itkGPUGradientAnisotropicDiffusionImageFilter.h"
+#endif
 
 #include <cmath>
+#include <string>
 #include <vector>
 
+using std::string;
 using std::vector;
 using af::array;
-using af::randu;
-using af::anisotropicDiffusion;
 using af::dim4;
-using af::deviceMemInfo;
-using af::deviceGC;
+
+constexpr unsigned int Dimension = 2;
+constexpr float TimeStep = 0.0105833f;
+constexpr float Conductance = 0.35f;
 
 static
-void asmBase(benchmark::State& state,
-             dim4 dims,
-             af_dtype type,
-             float timestep,
-             float conductance,
-             unsigned iterations)
-{
-    array inImg = randu(dims, type);
+void afBase(benchmark::State& state, af_dtype type, const string& image) {
+  using af::anisotropicDiffusion;
+  using af::loadImage;
 
-   //allocate output once to bypass alloc calls
-   //when smoothing function is actually called
-   if (type==f64)
-       array outTemp = randu(dims, f64);
-   else
-       array outTemp = randu(dims, f32);
-   af::sync();
+  const unsigned iterations = unsigned(state.range(0));
+  array in = loadImage(image.c_str(), false).as(type);
+  {
+    //allocate output once to bypass alloc calls
+    //when smoothing function is actually called
+    array dummy(in.dims(), type);
+    //run smoothing function to cache kernel compiled in first run
+    array out =
+        anisotropicDiffusion(in, TimeStep, Conductance, iterations);
+  }
+  af::sync();
+  for (auto _ : state) {
+    array out = anisotropicDiffusion(in, TimeStep, Conductance, iterations);
+    af::sync();
+  }
+  af::deviceGC();
+}
 
-  size_t alloc_bytes, alloc_buffers, lock_bytes, lock_buffers;
-  deviceMemInfo(&alloc_bytes, &alloc_buffers, &lock_bytes, &lock_buffers);
+#if defined(ENABLE_ITK)
+static
+void itkBase(benchmark::State& state, af_dtype type, const string& image) {
+  using InputPixelType = float;
+  using InputImageType = itk::GPUImage< InputPixelType, Dimension >;
+  using ReaderType = itk::ImageFileReader< InputImageType >;
+  using FilterType =
+      itk::GPUGradientAnisotropicDiffusionImageFilter< InputImageType, InputImageType >;
+
+  const unsigned iterations = unsigned(state.range(0));
+
+  ReaderType::Pointer reader = ReaderType::New();
+  reader->SetFileName(image.c_str());
+  reader->Update();
+
+  FilterType::Pointer filter = FilterType::New();
+  filter->SetInput(reader->GetOutput());
+  filter->SetNumberOfIterations(iterations);
+  filter->SetTimeStep(TimeStep);
+  filter->SetConductanceParameter(Conductance);
 
   for (auto _ : state) {
-      array out = anisotropicDiffusion(inImg, timestep, conductance, iterations);
-      af::sync();
+    try {
+        reader->Modified();
+        filter->UpdateLargestPossibleRegion();
+    } catch (itk::ExceptionObject & error) {
+        std::cerr << "Error: " << error << std::endl;
+        throw;
+    }
   }
-
-  size_t alloc_bytes2, alloc_buffers2, lock_bytes2, lock_buffers2;
-  deviceMemInfo(&alloc_bytes2, &alloc_buffers2, &lock_bytes2, &lock_buffers2);
-
-  state.counters["alloc_bytes"] = alloc_bytes2 - alloc_bytes;
-  state.counters["alloc_buffers"] = alloc_buffers2 - alloc_buffers;
-  deviceGC();
 }
-
-static
-void asmBench(benchmark::State& state, af_dtype type)
-{
-    unsigned dim0  = state.range(0);
-    unsigned dim1  = state.range(1);
-    unsigned iters = state.range(2);
-    asmBase(state, af::dim4(dim0, dim1), type, 0.0105833, 0.35, iters);
-}
+#endif
 
 int main(int argc, char** argv)
 {
-    vector<af_dtype> types = {f32, u32, u16, u8};
+  const vector<string> images = {
+      ASSETS_DIR "/trees_ctm.jpg",
+      ASSETS_DIR "/man.jpg",
+  };
 
-    af::benchmark::RegisterBenchmark("asm_varying_dims", types, asmBench)
-        ->RangeMultiplier(2)
-        ->Ranges({{16, 4096}, {16, 4096}, {8, 8}})
-        ->ArgNames({"dim0", "dim1", "iterations"})
-        ->Unit(benchmark::kMicrosecond);
+  //TODO(pradeep) enable other types later
+  //vector<af_dtype> types = {f32, u32, u16, u8};
+  vector<af_dtype> types = {f32};
 
-    af::benchmark::RegisterBenchmark("asm_iterations", types, asmBench)
-        ->RangeMultiplier(2)
-        ->Ranges({{3840, 3840}, {2160, 2160}, {2, 1<<7}})
-        ->ArgNames({"dim0", "dim1", "iterations"})
-        ->Unit(benchmark::kMicrosecond);
+  af::benchmark::RegisterBenchmark("AF_1280x800", types, afBase, images[0])
+      ->RangeMultiplier(2)
+      ->Range(2, 1<<7)
+      ->ArgName("Iterations")
+      ->Unit(benchmark::kMillisecond);
 
-    benchmark::Initialize(&argc, argv);
+  af::benchmark::RegisterBenchmark("AF_467x610", types, afBase, images[1])
+      ->RangeMultiplier(2)
+      ->Range(2, 1<<7)
+      ->ArgName("Iterations")
+      ->Unit(benchmark::kMillisecond);
 
-    af::benchmark::AFReporter r;
-    benchmark::RunSpecifiedBenchmarks(&r);
+#if defined(ENABLE_ITK)
+  af::benchmark::RegisterBenchmark("ITK_1280x800", types, itkBase, images[0])
+      ->RangeMultiplier(2)
+      ->Range(2, 1<<7)
+      ->ArgName("Iterations")
+      ->Unit(benchmark::kMillisecond);
+
+  af::benchmark::RegisterBenchmark("ITK_467x610", types, itkBase, images[1])
+      ->RangeMultiplier(2)
+      ->Range(2, 1<<7)
+      ->ArgName("Iterations")
+      ->Unit(benchmark::kMillisecond);
+#endif
+
+  benchmark::Initialize(&argc, argv);
+
+  af::benchmark::AFReporter r;
+  benchmark::RunSpecifiedBenchmarks(&r);
 }

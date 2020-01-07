@@ -19,12 +19,20 @@ else ()
     ${ArrayFire_DIR}/src/backend/opencl)
 endif ()
 
+option(ENABLE_ITK_BENCHMARKS "Enable ITK Benchmarks" OFF)
+if (ENABLE_ITK_BENCHMARKS)
+  find_package(ITK 5.0.1 REQUIRED)
+endif ()
+
 set(BENCHMARK_ENABLE_TESTING OFF CACHE INTERNAL "")
 set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE INTERNAL "")
 set(BENCHMARK_ENABLE_ASSEMPLY_TEST OFF CACHE INTERNAL "")
 add_subdirectory(benchmark EXCLUDE_FROM_ALL)
 
 include_directories(src)
+if (ENABLE_ITK_BENCHMARKS)
+  include(${ITK_USE_FILE})
+endif ()
 
 add_library(af_benchmark
   src/af_benchmark.cpp
@@ -33,14 +41,15 @@ add_library(af_benchmark
 
 target_link_libraries(af_benchmark
   PUBLIC
-    benchmark ArrayFire::af ${CMAKE_DL_LIBS})
+    benchmark
+    ArrayFire::af
+    ${ITK_LIBRARIES}
+    ${CMAKE_DL_LIBS}
+    )
 
 # add_executable(cudnn_conv_relu_pool src/cudnn_conv_relu_pool.cpp)
 # target_include_directories(cudnn_conv_relu_pool PRIVATE /opt/cuda/include)
 # target_link_libraries(cudnn_conv_relu_pool -L/opt/cuda/lib64 -lcudnn -lcudart af_benchmark)
-
-add_executable(anisotropic_smoothing src/anisotropic_smoothing.cpp)
-target_link_libraries(anisotropic_smoothing af_benchmark)
 
 add_executable(unified_af src/unified.cpp)
 add_executable(unified_cuda src/unified.cpp)
@@ -53,9 +62,16 @@ function(addBenchmark name)
   add_executable(${name} src/${name}.cpp)
   add_test(${name} ${name})
   target_link_libraries(${name} af_benchmark)
+  target_compile_definitions(${name}
+    PRIVATE ASSETS_DIR="${ArrayFire-Benchmarks_SOURCE_DIR}/assets"
+  )
+  if (ENABLE_ITK_BENCHMARKS)
+    target_compile_definitions(${name} PRIVATE ENABLE_ITK)
+  endif ()
 endfunction()
 
 addBenchmark(approx1)
+addBenchmark(anisotropic_smoothing)
 addBenchmark(randu)
 addBenchmark(topk)
 addBenchmark(nearest_neighbor)
