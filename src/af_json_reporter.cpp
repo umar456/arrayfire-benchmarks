@@ -51,6 +51,12 @@ std::string FormatKV(std::string const& key, int64_t value) {
   return ss.str();
 }
 
+std::string FormatKV(std::string const& key, uint64_t value) {
+  std::stringstream ss;
+  ss << '"' << key << "\": " << value;
+  return ss.str();
+}
+
 std::string FormatKV(std::string const& key, double value) {
   std::stringstream ss;
   ss << '"' << key << "\": ";
@@ -67,6 +73,16 @@ int64_t RoundDouble(double v) { return static_cast<int64_t>(v + 0.5); }
 }  // end namespace
 
 bool AFJSONReporter::ReportContext(const Context& context) {
+
+  auto replaceAll = [](std::string* str, const std::string& from,
+          const std::string& to) {
+      std::size_t start = 0;
+      while ((start = str->find(from, start)) != std::string::npos) {
+          str->replace(start, from.length(), to);
+          start += to.length();
+      }
+  };
+
   std::ostream& out = GetOutputStream();
 
   out << "{\n";
@@ -84,7 +100,7 @@ bool AFJSONReporter::ReportContext(const Context& context) {
     // which must be escaped in JSON otherwise it blows up conforming JSON
     // decoders
     std::string executable_name = Context::executable_name;
-    ::benchmark::ReplaceAll(&executable_name, "\\", "\\\\");
+    replaceAll(&executable_name, "\\", "\\\\");
     out << indent << FormatKV("executable", executable_name) << ",\n";
   }
 
@@ -182,7 +198,7 @@ void AFJSONReporter::Finalize() {
 void AFJSONReporter::PrintRunData(Run const& run) {
   std::string indent(6, ' ');
   std::ostream& out = GetOutputStream();
-  out << indent << FormatKV("name", run.benchmark_name) << ",\n";
+  out << indent << FormatKV("name", run.benchmark_name()) << ",\n";
   out << indent << FormatKV("run_type", [&run]() -> const char* {
     switch (run.run_type) {
       case BenchmarkReporter::Run::RT_Iteration:
@@ -210,14 +226,6 @@ void AFJSONReporter::PrintRunData(Run const& run) {
     out << indent << FormatKV("time_unit", GetTimeUnitString(run.time_unit));
   } else if (run.report_rms) {
     out << indent << FormatKV("rms", run.GetAdjustedCPUTime());
-  }
-  if (run.bytes_per_second > 0.0) {
-    out << ",\n"
-        << indent << FormatKV("bytes_per_second", run.bytes_per_second);
-  }
-  if (run.items_per_second > 0.0) {
-    out << ",\n"
-        << indent << FormatKV("items_per_second", run.items_per_second);
   }
   for (auto& c : run.counters) {
     out << ",\n" << indent << FormatKV(c.first, c.second);
