@@ -111,7 +111,8 @@ bool AFJSONReporter::ReportContext(const Context& context) {
       << FormatKV("mhz_per_cpu",
                   RoundDouble(info.cycles_per_second / 1000000.0))
       << ",\n";
-  out << indent << FormatKV("cpu_scaling_enabled", info.scaling_enabled)
+  out << indent << FormatKV("cpu_scaling_enabled",
+                            info.scaling == ::benchmark::CPUInfo::ENABLED)
       << ",\n";
 
 
