@@ -7,11 +7,22 @@
 
 # Installation
 
+Separate build directory:
 ```
 git clone http://github.com/umar456/arrayfire-benchmarks
-cd arrayfire-benchmark
+cd arrayfire-benchmarks
+git clone --branch v1.5.2 http://github.com/google/benchmark
+mkdir build && cd build
+cmake -DArrayFire_DIR=/path/to/build/dir ..
+make -j8
+```
+
+ArrayFire Inline:
+```
+git clone http://github.com/umar456/arrayfire-benchmarks
+cd arrayfire-benchmarks
 git clone http://github.com/arrayfire/arrayfire
-git clone http://github.com/google/benchmark
+git clone --branch v1.5.2 http://github.com/google/benchmark
 mkdir build && cd build
 cmake ..
 make -j8
