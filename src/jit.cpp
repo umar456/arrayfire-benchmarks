@@ -169,13 +169,13 @@ int main(int argc, char** argv) {
 
   af::benchmark::RegisterBenchmark("multiEval", types, multipleEval)
     //->Iterations(1)
-    ->Ranges({{1, 1<<28}, {1, 1}, {1, 1}, {1, 1}, {1, 2}})
+    ->Ranges({{1, 1<<26}, {1, 1}, {1, 1}, {1, 1}, {1, 2}})
     ->ArgNames({"dim0", "dim1", "dim2", "dim3", "nops"})
     ->Unit(benchmark::kMicrosecond);
 
   af::benchmark::RegisterBenchmark("jitDim0", types, jitBench)
     //->Iterations(1)
-    ->Ranges({{1, 1<<28}, {1, 1}, {1, 1}, {1, 1}, {1, 1<<8}})
+    ->Ranges({{1, 1<<26}, {1, 1}, {1, 1}, {1, 1}, {1, 1<<8}})
     ->ArgNames({"dim0", "dim1", "dim2", "dim3", "nops"})
     ->Unit(benchmark::kMicrosecond);
 
