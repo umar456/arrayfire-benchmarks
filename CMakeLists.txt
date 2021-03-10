@@ -47,8 +47,11 @@ add_executable(unified_cuda src/unified.cpp)
 target_link_libraries(unified_af benchmark ArrayFire::af af_benchmark)
 target_link_libraries(unified_cuda benchmark ArrayFire::afcuda af_benchmark)
 
+enable_testing()
+
 function(addBenchmark name)
   add_executable(${name} src/${name}.cpp)
+  add_test(${name} ${name})
   target_link_libraries(${name} af_benchmark)
 endfunction()
 
