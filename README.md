@@ -9,7 +9,7 @@
 
 Separate build directory:
 ```
-git clone http://github.com/umar456/arrayfire-benchmarks
+git clone --recursive http://github.com/umar456/arrayfire-benchmarks
 cd arrayfire-benchmarks
 git clone --branch v1.5.2 http://github.com/google/benchmark
 mkdir build && cd build
@@ -19,10 +19,9 @@ make -j8
 
 ArrayFire Inline:
 ```
-git clone http://github.com/umar456/arrayfire-benchmarks
+git clone --recursive http://github.com/umar456/arrayfire-benchmarks
 cd arrayfire-benchmarks
 git clone http://github.com/arrayfire/arrayfire
-git clone --branch v1.5.2 http://github.com/google/benchmark
 mkdir build && cd build
 cmake ..
 make -j8
