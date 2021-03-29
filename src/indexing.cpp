@@ -63,6 +63,52 @@ void indexingBench(benchmark::State& state, af_dtype type) {
   //af::printMemInfo();
 }
 
+void indexingBench2(benchmark::State& state, af_dtype type) {
+
+  int dim = state.range(0);
+  dim4 dims(state.range(2),  state.range(3), state.range(4), state.range(5));
+  dim4 odims(state.range(2), state.range(3), state.range(4), state.range(5));
+
+  dims[dim] = state.range(1);
+  //std::cout << dims << std::endl;
+  //std::cout << odims << std::endl;
+
+  {
+    array a = randu(dims, type);
+    array out = randu(odims, type);
+
+      switch(dim) {
+        case 0: a = out(seq(state.range(1)), span, span, span); break;
+        case 1: a = out(span, seq(state.range(1)), span, span); break;
+        case 2: a = out(span, span, seq(state.range(1)), span); break;
+        case 3: a = out(span, span, span, seq(state.range(1))); break;
+      }
+
+    size_t alloc_bytes, alloc_buffers, lock_bytes, lock_buffers;
+    deviceMemInfo(&alloc_bytes, &alloc_buffers, &lock_bytes, &lock_buffers);
+    for(auto _ : state) {
+      switch(dim) {
+        case 0: a = out(seq(state.range(1)), span, span, span); break;
+        case 1: a = out(span, seq(state.range(1)), span, span); break;
+        case 2: a = out(span, span, seq(state.range(1)), span); break;
+        case 3: a = out(span, span, span, seq(state.range(1))); break;
+      }
+      out.eval();
+      af::sync();
+    }
+
+    size_t alloc_bytes2, alloc_buffers2, lock_bytes2, lock_buffers2;
+    deviceMemInfo(&alloc_bytes2, &alloc_buffers2, &lock_bytes2, &lock_buffers2);
+
+    state.counters["alloc_bytes"] = alloc_bytes2 - alloc_bytes;
+    state.counters["alloc_buffers"] = alloc_buffers2 - alloc_buffers;
+    state.counters["bytes"] = a.bytes();
+  }
+  deviceGC();
+  //af::printMemInfo();
+}
+
+
 void
 CustomArgs(benchmark::internal::Benchmark* b) {
     vector<pair<int, int>> sizes = {
@@ -101,7 +147,8 @@ int main(int argc, char** argv) {
     ->Apply(CustomArgs)
     ->ArgNames({"dim", "elements", "dim0", "dim1", "dim2", "dim3"});
 
-  af::benchmark::AFJSONReporter jsonr;
+  //af::benchmark::AFJSONReporter jsonr;
+  // benchmark::RunSpecifiedBenchmarks(&r, &jsonr);
   af::benchmark::AFReporter r;
-  benchmark::RunSpecifiedBenchmarks(&r, &jsonr);
+  benchmark::RunSpecifiedBenchmarks(&r);
 }

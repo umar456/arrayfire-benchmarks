@@ -36,6 +36,7 @@ int main(int argc, char** argv) {
         //->Iterations(2)
         ->Unit(benchmark::kMicrosecond);
 
-    af::benchmark::AFJSONReporter r;
+    //af::benchmark::AFJSONReporter r;
+    af::benchmark::AFReporter r;
     benchmark::RunSpecifiedBenchmarks(&r);
 }

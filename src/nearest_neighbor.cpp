@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
   vector<af_dtype> types = {f32, f64, u32, s32};
 
   af::benchmark::RegisterBenchmark("NearestNeighbour", types, nnBench)
-        ->Ranges({{4, 1<<16}, {2, 1<<16}, {2, 256}, {1, 1}, {1, 1}})
+        ->Ranges({{4, 1<<14}, {2, 1<<8}, {2, 256}, {1, 1}, {1, 1}})
         ->ArgNames({"qdim0", "tdim0", "fdim", "dist_dim", "n_dist"});
 
   benchmark::Initialize(&argc, argv);

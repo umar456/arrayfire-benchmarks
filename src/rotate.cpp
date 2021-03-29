@@ -29,7 +29,7 @@ static auto genRotateBench(af_interp_type rType, float angle) {
 }
 
 void registerBenchmark(string name, af_interp_type type, float angle) {
-    static vector<af_dtype> types = {f32, f64, u8};
+    static vector<af_dtype> types = {f32, u8};
     string benchName = "rotate:" + name + "/angle:" + to_string((int)angle);
     af::benchmark::RegisterBenchmark(benchName.c_str(), types, genRotateBench(type, angle))
         ->Ranges({{8, 1 << 12}, {8, 1 << 11}, {0, 1}})

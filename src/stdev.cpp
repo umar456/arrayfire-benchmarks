@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
 
     benchmark::Initialize(&argc, argv);
     af::benchmark::RegisterBenchmark("stdev", types, stdevBench)
-        ->Ranges({{8, 1<<12}, {8, 1<<12}, {8, 1<<12}, {8, 1<<12}, {0, 3}})
+        ->Ranges({{8, 1<<10}, {8, 1<<8}, {8, 1<<6}, {8, 1<<2}, {0, 3}})
         ->ArgNames({"dim0", "dim1", "dim2", "dim3", "stdevDim"})
         ->Unit(benchmark::kMicrosecond);
 

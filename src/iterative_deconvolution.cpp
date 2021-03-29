@@ -61,18 +61,18 @@ void asmBench(benchmark::State& state, af_dtype type)
 
 int main(int argc, char** argv)
 {
-    vector<af_dtype> types = {f32, u16, u8};
+  vector<af_dtype> types = {f32, u16, u8};
 
-    af::benchmark::RegisterBenchmark("varying_iterations", types, asmBench)
-        ->Iterations(20)
-        ->RangeMultiplier(2)
-        ->Ranges({{3648, 3648}, {2432, 2432}, {13, 13}, {2, 1<<7}, {1, 1}})
-        ->Ranges({{3648, 3648}, {2432, 2432}, {13, 13}, {2, 1<<7}, {2, 2}})
-        ->ArgNames({"dim0", "dim1", "psf_radius", "algo_iterations", "AlgoEnum"})
-        ->Unit(benchmark::kMicrosecond);
+  benchmark::Initialize(&argc, argv);
 
-    benchmark::Initialize(&argc, argv);
+  af::benchmark::RegisterBenchmark("varying_iterations", types, asmBench)
+      ->Iterations(20)
+      ->RangeMultiplier(2)
+      ->Ranges({{3648, 3648}, {2432, 2432}, {13, 13}, {2, 1 << 7}, {1, 1}})
+      ->Ranges({{3648, 3648}, {2432, 2432}, {13, 13}, {2, 1 << 7}, {2, 2}})
+      ->ArgNames({"dim0", "dim1", "psf_radius", "algo_iterations", "AlgoEnum"})
+      ->Unit(benchmark::kMicrosecond);
 
-    af::benchmark::AFReporter r;
-    benchmark::RunSpecifiedBenchmarks(&r);
+  af::benchmark::AFReporter r;
+  benchmark::RunSpecifiedBenchmarks(&r);
 }

@@ -187,7 +187,7 @@ int main(int argc, char** argv) {
 
   af::benchmark::RegisterBenchmark("jit2", types, jitBench)
     //->Iterations(2)
-    ->Ranges({{1<<13, 1<<13}, {1, 1<<16}, {1, 1}, {1, 1}, {1, 1<<8}})
+    ->Ranges({{1<<13, 1<<13}, {1, 1<<15}, {1, 1}, {1, 1}, {1, 1<<8}})
     ->ArgNames({"dim0", "dim1", "dim2", "dim3", "nops"})
     ->Unit(benchmark::kMicrosecond);
 

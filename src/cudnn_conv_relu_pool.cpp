@@ -201,8 +201,9 @@ int main(int argc, char** argv) {
     ->Ranges({{32, 1<<10}, {32, 1<<10}, {1, 512}, {5, 5}})
     ->ArgNames({"dim0", "dim1", "batchsize", "dim_filt"});
 
+  //af::benchmark::AFJSONReporter jsr;
+  //benchmark::RunSpecifiedBenchmarks(&r, &jsr);
   af::benchmark::AFReporter r;
-  af::benchmark::AFJSONReporter jsr;
-  benchmark::RunSpecifiedBenchmarks(&r, &jsr);
+  benchmark::RunSpecifiedBenchmarks(&r);
 }
 

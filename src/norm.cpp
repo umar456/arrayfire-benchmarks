@@ -32,7 +32,7 @@ static auto genNorm(af::normType nType) {
 void registerBenchmark(std::string name, af::normType type) {
     static vector<af_dtype> types = {f32, f64};
     af::benchmark::RegisterBenchmark(("norm:" + name).c_str() , types, genNorm(type))
-        ->Ranges({{8, 1 << 24}, {8, 1 << 24}})
+        ->Ranges({{8, 1 << 18}, {8, 1 << 8}})
         ->ArgNames({"dim0", "dim1"})
         ->Unit(benchmark::kMicrosecond);
 }
