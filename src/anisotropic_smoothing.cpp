@@ -26,6 +26,7 @@ void afBase(benchmark::State& state, af_dtype type, const string& image) {
 
   const unsigned iterations = unsigned(state.range(0));
   array in = loadImage(image.c_str(), false).as(type);
+  in.eval();
   {
     //allocate output once to bypass alloc calls
     //when smoothing function is actually called
@@ -33,10 +34,12 @@ void afBase(benchmark::State& state, af_dtype type, const string& image) {
     //run smoothing function to cache kernel compiled in first run
     array out =
         anisotropicDiffusion(in, TimeStep, Conductance, iterations);
+    out.eval();
   }
   af::sync();
   for (auto _ : state) {
     array out = anisotropicDiffusion(in, TimeStep, Conductance, iterations);
+    out.eval();
     af::sync();
   }
   af::deviceGC();
@@ -97,6 +100,8 @@ int main(int argc, char** argv)
       ->Range(2, 1<<7)
       ->ArgName("Iterations")
       ->Unit(benchmark::kMillisecond);
+
+  af::deviceGC();
 
 #if defined(ENABLE_ITK)
   af::benchmark::RegisterBenchmark("ITK_1280x800", types, itkBase, images[0])

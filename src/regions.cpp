@@ -72,13 +72,13 @@ void itkBase(benchmark::State& state, af_dtype type, const string& image) {
 int main(int argc, char** argv)
 {
   const vector< std::array<string, 2> > benchInputs = {
-      {"DesendingPlot", ASSETS_DIR "/ConnectedComponents/descending_1.png"},
-      {"PolkaDots", ASSETS_DIR "/ConnectedComponents/dots_31.png"},
       {"EmptyImage", ASSETS_DIR "/ConnectedComponents/empty_0.png"},
       {"FullImage", ASSETS_DIR "/ConnectedComponents/full_1.png"},
+      {"LargeVSpanningImage", ASSETS_DIR "/ConnectedComponents/v_1.png"},
+      {"DesendingPlot", ASSETS_DIR "/ConnectedComponents/descending_1.png"},
+      {"PolkaDots", ASSETS_DIR "/ConnectedComponents/dots_31.png"},
       {"ImageFullofText", ASSETS_DIR "/ConnectedComponents/largetext_208.png"},
       {"TilesofText", ASSETS_DIR "/ConnectedComponents/texttiles_2140.png"},
-      {"LargeVSpanningImage", ASSETS_DIR "/ConnectedComponents/v_1.png"},
   };
 
   vector<af_dtype> types = {b8};
@@ -87,12 +87,14 @@ int main(int argc, char** argv)
       af::benchmark::RegisterBenchmark(
               ("AF/"+benchIn[0]).c_str(), types, afBase, benchIn[1])
           ->Unit(benchmark::kMillisecond);
+  }
 #if defined(ENABLE_ITK)
+  for (auto& benchIn: benchInputs) {
       af::benchmark::RegisterBenchmark(
               ("ITK/"+benchIn[0]).c_str(), types, itkBase, benchIn[1])
           ->Unit(benchmark::kMillisecond);
-#endif
   }
+#endif
 
   benchmark::Initialize(&argc, argv);
 
