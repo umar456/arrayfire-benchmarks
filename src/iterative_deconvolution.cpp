@@ -69,7 +69,7 @@ int main(int argc, char** argv)
         ->Ranges({{3648, 3648}, {2432, 2432}, {13, 13}, {2, 1<<7}, {1, 1}})
         ->Ranges({{3648, 3648}, {2432, 2432}, {13, 13}, {2, 1<<7}, {2, 2}})
         ->ArgNames({"dim0", "dim1", "psf_radius", "algo_iterations", "AlgoEnum"})
-        ->Unit(benchmark::kMicrosecond);
+        ->Unit(benchmark::kMillisecond);
 
     benchmark::Initialize(&argc, argv);
 
