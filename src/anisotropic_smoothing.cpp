@@ -6,6 +6,7 @@
 #include "itkGPUGradientAnisotropicDiffusionImageFilter.h"
 #endif
 
+#include <array>
 #include <cmath>
 #include <string>
 #include <vector>
@@ -80,14 +81,28 @@ void itkBase(benchmark::State& state, af_dtype type, const string& image) {
 
 int main(int argc, char** argv)
 {
+  //TODO(pradeep) enable other types later
+  //vector<af_dtype> types = {f32, u32, u16, u8};
+  vector<af_dtype> types = {f32};
+
   const vector<string> images = {
       ASSETS_DIR "/trees_ctm.jpg",
       ASSETS_DIR "/man.jpg",
   };
-
-  //TODO(pradeep) enable other types later
-  //vector<af_dtype> types = {f32, u32, u16, u8};
-  vector<af_dtype> types = {f32};
+  const vector<std::array<string, 2>> asmImages = {
+      {"4160x3120", ASSETS_DIR "/SizeVariation/01.jpg"},
+      {"3648x2432", ASSETS_DIR "/SizeVariation/02.jpg"},
+      {"2592x1944", ASSETS_DIR "/SizeVariation/03.jpg"},
+      {"2048x1536", ASSETS_DIR "/SizeVariation/04.jpg"},
+      {"1024x682" , ASSETS_DIR "/SizeVariation/05.jpg"},
+      {"912x441"  , ASSETS_DIR "/SizeVariation/06.bmp"},
+      {"553x411"  , ASSETS_DIR "/SizeVariation/07.bmp"},
+      {"500x462"  , ASSETS_DIR "/SizeVariation/08.bmp"},
+      {"413x339"  , ASSETS_DIR "/SizeVariation/09.bmp"},
+      {"356x354"  , ASSETS_DIR "/SizeVariation/10.bmp"},
+      {"277x145"  , ASSETS_DIR "/SizeVariation/11.bmp"},
+      {"188x149"  , ASSETS_DIR "/SizeVariation/12.bmp"},
+  };
 
   af::benchmark::RegisterBenchmark("AF_1280x800", types, afBase, images[0])
       ->RangeMultiplier(2)
@@ -116,6 +131,15 @@ int main(int argc, char** argv)
       ->ArgName("Iterations")
       ->Unit(benchmark::kMillisecond);
 #endif
+
+  for(auto& img: asmImages) {
+      auto name = "AF_" + img[0];
+      af::benchmark::RegisterBenchmark(name.c_str(), types, afBase, img[1])
+          ->RangeMultiplier(2)
+          ->Range(32, 32)
+          ->ArgName("Iterations")
+          ->Unit(benchmark::kMillisecond);
+  }
 
   benchmark::Initialize(&argc, argv);
 
